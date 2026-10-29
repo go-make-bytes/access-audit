@@ -85,6 +85,12 @@ func (c *Configuration) Bind(_ string, v *viper.Viper) {
 		v.SetDefault("access_audit_seal_key", key)
 	}
 
+	// The connection string carries the role's password, so it may come from the
+	// secret store (ACCESS_AUDIT_STORE_DSN_FILE) as well; an explicit environment value wins.
+	if dsn, err := corecfg.LoadRemoteSecret("ACCESS_AUDIT_STORE_DSN"); err == nil && dsn != "" {
+		v.SetDefault("access_audit_store_dsn", dsn)
+	}
+
 	_ = v.BindEnv("access_audit_store_dsn", "ACCESS_AUDIT_STORE_DSN")
 	_ = v.BindEnv("access_audit_seal_key", "ACCESS_AUDIT_SEAL_KEY")
 	_ = v.BindEnv("access_audit_system", "ACCESS_AUDIT_SYSTEM")
@@ -95,6 +101,9 @@ func (c *Configuration) Bind(_ string, v *viper.Viper) {
 
 // Validate validates the configuration.
 func (c *Configuration) Validate(valid *validation.Validate) error {
+	if err := refuseEmptyFileSecret("ACCESS_AUDIT_STORE_DSN", c.StoreDSN); err != nil {
+		return err
+	}
 	if err := c.BaseConfiguration.Validate(valid); err != nil {
 		return err
 	}

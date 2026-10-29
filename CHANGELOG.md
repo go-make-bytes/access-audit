@@ -3,6 +3,22 @@
 Notable changes to this service, newest first, per release. This file is written for whoever
 runs the service or integrates against it.
 
+## Unreleased
+
+### Added
+
+- **`ACCESS_AUDIT_STORE_DSN_FILE`.** The database connection string carries the role's password, so it can now be
+  read from a file (for example one a secrets agent writes), as the seal key already can.
+  `ACCESS_AUDIT_STORE_DSN`, when set, still wins, so an existing deployment changes nothing. If the file is named but
+  missing or empty, the service refuses to start instead of falling back to the non-durable in-memory store, so a
+  secrets agent that is late is waited for, not mistaken for "no database".
+
+### Changed
+
+- **Libraries updated, and the service now builds with Go 1.27.3:** azugo v0.40.2, go-authbyte v0.32.0,
+  go-platform-kit v1.11.5 and go-sec-events v1.2.3, with the other dependencies at their current releases. Nothing
+  about the API, the configuration or the database changes.
+
 ## v0.1.2
 
 A security release. **The service now builds with Go 1.27.2**, and its libraries move to their Go
