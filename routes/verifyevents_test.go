@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"azugo.io/azugo"
 	"github.com/go-quicktest/qt"
@@ -33,7 +34,9 @@ func TestRecordVerifyEvent(t *testing.T) {
 
 	tc := app.TestClient()
 	resp, err := tc.PostJSON("/v1/verify-events", map[string]any{
-		"ts":            "2026-07-20T10:00:00Z",
+		// Recent on purpose: the startup sweep deletes verify events older than the
+		// retention window, so a fixed past date turns this into a test of timing.
+		"ts":            time.Now().UTC().Add(-time.Minute).Format(time.RFC3339),
 		"ip":            "203.0.113.7",
 		"userAgent":     "Mozilla/5.0",
 		"sizeBytes":     12345,
