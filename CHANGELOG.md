@@ -3,7 +3,7 @@
 Notable changes to this service, newest first, per release. This file is written for whoever
 runs the service or integrates against it.
 
-## Unreleased
+## v0.2.0
 
 ### Added
 
