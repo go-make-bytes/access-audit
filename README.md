@@ -185,6 +185,7 @@ Standard platform/azugo + go-authbyte env applies (`SERVER_URLS`, `SERVICE_NAME`
 
 | Env var | Default | Meaning |
 |---|---|---|
+| `ACCESS_AUDIT_STORE_DSN_FILE` | — | Path of a file holding the `ACCESS_AUDIT_STORE_DSN` value (written by a secrets agent); read when `ACCESS_AUDIT_STORE_DSN` is not set, surrounding whitespace trimmed. |
 | `ACCESS_AUDIT_STORE_DSN` | — (empty ⇒ in-memory) | PostgreSQL DSN; connects as the EXECUTE-only `access_audit_public` role. Unset selects the non-durable in-memory backend (**development only**). Source it from the secret store in production — it carries a password. Pool size comes from the DSN itself — `pool_max_conns` (pgx reads it and strips it before Postgres sees it; its default is the host's CPU count): set it explicitly to the deployment's connection budget, e.g. `?sslmode=…&pool_max_conns=4&pool_min_conns=1`. |
 | `ACCESS_AUDIT_SEAL_KEY` | — (**required**, ≥ 32 bytes) | HMAC key for per-row seals and per-period checkpoints. Held in memory only; **never persisted with the records**. Loaded from the platform remote secret store when available, else from the environment. A shorter key fails startup |
 | `ACCESS_AUDIT_SYSTEM` | `default` | Optional tenant/system dimension stamped on every record |
