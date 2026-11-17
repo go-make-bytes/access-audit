@@ -3,6 +3,16 @@
 Notable changes to this service, newest first, per release. This file is written for whoever
 runs the service or integrates against it.
 
+## v0.3.0
+
+### Changed
+
+- **The service now runs on Go 1.27.4 and azugo v0.50.2**, with go-authbyte v0.46.0, go-platform-kit v1.13.0 and
+  go-sec-events v1.3.0. Nothing about the configuration or the database changes.
+- **Request bodies are held to the framework's limit:** a body over 4 MiB answers 413. That is the default; set
+  `SERVER_MAX_REQUEST_BODY_SIZE` to change it. The access-record, legal-hold and verify-event bodies are each one
+  small event, so no route needs more.
+
 ## v0.2.0
 
 ### Added
