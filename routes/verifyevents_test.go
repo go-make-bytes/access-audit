@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -87,4 +88,22 @@ func TestRecordVerifyEventVerdictRequired(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 	defer fasthttp.ReleaseResponse(resp)
 	qt.Assert(t, qt.Equals(resp.StatusCode(), fasthttp.StatusBadRequest))
+}
+
+// A JSON body over the framework's default 4 MiB limit is refused with 413 and
+// nothing is recorded.
+func TestRecordVerifyEventBodyOverLimit(t *testing.T) {
+	app, mem := verifyTestApp(t)
+	app.Start(t)
+	defer app.Stop()
+
+	tc := app.TestClient()
+	big := []byte(`{"verdict":"PASSED","userAgent":"` + strings.Repeat("a", 4<<20+1) + `"}`)
+	resp, err := tc.Post("/v1/verify-events", big,
+		tc.WithHeader("X-Test-Scopes", "verify-audit:write"),
+		tc.WithHeader("Content-Type", "application/json"))
+	qt.Assert(t, qt.IsNil(err))
+	defer fasthttp.ReleaseResponse(resp)
+	qt.Assert(t, qt.Equals(resp.StatusCode(), fasthttp.StatusRequestEntityTooLarge))
+	qt.Check(t, qt.Equals(len(mem.VerifyEvents()), 0))
 }
